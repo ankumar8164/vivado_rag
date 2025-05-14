@@ -28,19 +28,6 @@ def remove_headings_and_footer(md_text, heading_patterns=None, footer_pattern = 
 
     return "\n".join(out_lines)
 
-
-def chunk_markdown(md_text, chunk_size = 500, chunk_overlap = 100):
-    """
-    1) Cleans out headings & footers
-    2) Splits into overlapping chunks via LangChain
-    """
-    cleaned = remove_headings_and_footer(md_text)
-    splitter = RecursiveCharacterTextSplitter(
-        chunk_size=chunk_size,
-        chunk_overlap=chunk_overlap
-    )
-    return splitter.split_text(cleaned)
-
 def remove_markdown_tables(md_text):
     """
     Removes any contiguous block of lines that look like a Markdown table.
@@ -61,3 +48,16 @@ def remove_markdown_tables(md_text):
         filtered.append(lines[i])
         i += 1
     return "\n".join(filtered)
+
+def chunk_markdown(md_text, chunk_size = 500, chunk_overlap = 100):
+    """
+    1) Cleans out headings & footers
+    2) Splits into overlapping chunks via LangChain
+    """
+    cleaned = remove_headings_and_footer(md_text)
+    cleaned = remove_markdown_tables(cleaned)
+    splitter = RecursiveCharacterTextSplitter(
+        chunk_size=chunk_size,
+        chunk_overlap=chunk_overlap
+    )
+    return splitter.split_text(cleaned)
